@@ -22,7 +22,24 @@ showed that if I saved the JSON file anywhere else on my local computer (other t
 without reloading the browser page. I’m still unclear if the page-reload problem is particular to just VS-Code or Live Server (or both working 
 together), and if the problem occurs in other integrated development environments (IDEs).
 
-Please let me know if you have further insights related to this problem.
+### Resolution
+I discovered when using Live Server (by Ritwick Dey) in VS-Code that files in the public folder (that reside within the root project folder) 
+needs to be ignored by Live Server. This is accomplished by creating a settings.json file within the .vscode folder. For an example of how 
+to create a setting.json file, see link: https://github.com/ritwickdey/vscode-live-server/blob/HEAD/docs/faqs.md. Below are the 
+liveServer.settings I used to resolve the page reload problem.
+
+Project_root_folder/.vscode/setting.json
+```
+	{
+		"liveServer.settings.ignoreFiles" : [
+			".vscode/**",
+			"public/**"
+		]
+
+	}
+```
+
+Other suggestions or insights appreciated.
 
 Thank you!
 
