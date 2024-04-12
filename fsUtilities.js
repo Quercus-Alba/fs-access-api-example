@@ -17,13 +17,18 @@ async function saveAs(data) {
         multiple: false,
     };
 
-    const fileHandle = await showSaveFilePicker(options);
-    data.setState('updateFileHandle', fileHandle);
+    try {
+        const fileHandle = await showSaveFilePicker(options);
+        data.setState('updateFileHandle', fileHandle);
+        const writable = await fileHandle.createWritable();
+        const values = JSON.stringify(data.state);
+        await writable.write(values);
+        await writable.close();
 
-    const writable = await fileHandle.createWritable();
-    const values = JSON.stringify(data.state);
-    await writable.write(values);
-    await writable.close();
+    } catch (error) {
+        console.log(error);
+    }
+
 }  // end saveAs()
 
 
@@ -42,17 +47,21 @@ async function saveEdit(data) {
         multiple: false,
     };
 
-    let fileHandle = data.state.fileHandle;
-    if (fileHandle === null) {
-        [fileHandle] = await window.showOpenFilePicker(options);
-        data.setState('updateFileHandle', fileHandle);
-    }
+    try {
+        let fileHandle = data.state.fileHandle;
+        if (fileHandle === null) {
+            [fileHandle] = await window.showOpenFilePicker(options);
+            data.setState('updateFileHandle', fileHandle);
+        }
+        const values = JSON.stringify(data.state);
+        const writable = await fileHandle.createWritable();
+        await writable.write(values);
+        await writable.close();
 
-    const values = JSON.stringify(data.state);
-    const writable = await fileHandle.createWritable();
-    await writable.write(values);
-    await writable.close();
-}
+    } catch (error) {
+        console.log(error);
+    }
+}  // end saveEdit()
 
 
 async function loadOpen(data) {
@@ -70,17 +79,21 @@ async function loadOpen(data) {
         multiple: false,
     };
 
-    const [fileHandle] = await showOpenFilePicker(options);
-    
-    if (fileHandle.kind === "file") {
-        const file = await fileHandle.getFile();
-        const text = await file.text();
-        const value = JSON.parse(text);
+    try {
+        const [fileHandle] = await showOpenFilePicker(options);
+        if (fileHandle.kind === "file") {
+            const file = await fileHandle.getFile();
+            const text = await file.text();
+            const value = JSON.parse(text);
 
-        data.setState('updateState', value);
-        data.render('displayState', data.state);
-        data.setState('updateFileHandle', fileHandle);
+            data.setState('updateState', value);
+            data.render('displayState', data.state);
+            data.setState('updateFileHandle', fileHandle);
+        }
+
+    } catch (error) {
+        console.log(error);
     }
-}
+}  // end loadOpen
 
 export { saveAs, saveEdit, loadOpen };
